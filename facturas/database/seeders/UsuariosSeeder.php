@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
-class UsuariosPrueba extends Seeder
+class UsuariosSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -27,6 +27,20 @@ class UsuariosPrueba extends Seeder
         $user2 = User::create([
             'name' => 'Cliente 1',
             'email' => 'cliente1@example.com',
+            'role' => 'Cliente',
+            'password'  =>  Hash::make('password'),
+            'email_verified_at' => Carbon::now(),
+        ]);
+        $user3 = User::create([
+            'name' => 'Cliente 2',
+            'email' => 'cliente2@example.com',
+            'role' => 'Cliente',
+            'password'  =>  Hash::make('password'),
+            'email_verified_at' => Carbon::now(),
+        ]);
+        $user4 = User::create([
+            'name' => 'Cliente 3',
+            'email' => 'cliente3@example.com',
             'role' => 'Cliente',
             'password'  =>  Hash::make('password'),
             'email_verified_at' => Carbon::now(),

@@ -2,11 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\compra;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class CompraController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,7 +38,7 @@ class CompraController extends Controller
      */
     public function create()
     {
-        //
+        return view('compra.create');
     }
 
     /**
@@ -35,7 +49,17 @@ class CompraController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $compra = compra::create([
+            'product_id'    =>  $request->product_id,
+            'user_id'       =>  Auth::user()->id,
+        ]);
+        $result = $compra->save();
+
+        if ($result) {
+            return redirect()->route('home')->with('success', 'Se generó la venta correctamente.');
+        }else{
+            return Redirect()->back()->with('error','Venta no generada.');
+        }
     }
 
     /**
@@ -44,9 +68,14 @@ class CompraController extends Controller
      * @param  \App\Models\compra  $compra
      * @return \Illuminate\Http\Response
      */
-    public function show(compra $compra)
+    public function show($compra_id)
     {
-        //
+        $compra = compra::find($compra_id);
+        if(isset($compra)) {
+            return view('compra.show', compact('compra'));
+        }else{
+            return Redirect()->back()->with('error','compra no encontrada.');
+        }
     }
 
     /**
@@ -55,9 +84,16 @@ class CompraController extends Controller
      * @param  \App\Models\compra  $compra
      * @return \Illuminate\Http\Response
      */
-    public function edit(compra $compra)
+    public function edit($compra_id)
     {
-        //
+        $compra = compra::find($compra_id);        
+        
+        //Revisa que el usuario exista
+        if (isset($compra)) {
+            return view('compra.edit', compact('compra'));
+        }else{
+            return Redirect()->back()->with('error','Compra no encontrada.');
+        }
     }
 
     /**
@@ -67,9 +103,21 @@ class CompraController extends Controller
      * @param  \App\Models\compra  $compra
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, compra $compra)
+    public function update(Request $request, $compra_id)
     {
-        //
+        $compra = compra::find($compra_id);
+        
+        //Revisa que el usuario exista
+        if (isset($compra)) {
+            $request->validate([
+                'product_id'    => 'required',
+            ]);
+
+            $compra->product_id = $request->product_id;
+            $compra->save();
+
+            return redirect()->route('home')->with('success','Compra Editada Correctamente.');
+        }
     }
 
     /**
@@ -78,8 +126,9 @@ class CompraController extends Controller
      * @param  \App\Models\compra  $compra
      * @return \Illuminate\Http\Response
      */
-    public function destroy(compra $compra)
+    public function destroy($compra_id)
     {
-        //
+        compra::destroy($compra_id);
+        return redirect()->route('home')->with('success',"Compra Eliminada Correctamente.");
     }
 }
